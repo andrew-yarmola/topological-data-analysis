@@ -6,17 +6,37 @@ from gtda.pipeline import make_pipeline
 from gtda.diagrams import BettiCurve
 from gtda.homology import CubicalPersistence
 
-def bettiCurve(img_file):
+def bettiCurve_pipe1(img_file):
+    """
+    Pipeline 1: Binarizer --> Height Filtration --> Cubical Persistance --> Betti Curve
+    """
     img = cv2.imread(img_file)  
     img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     # blur the image to reduce noise
     figure_size = 9 # the dimension of the x and y axis of the kernal.
-    img = cv2.blur(img,(figure_size, figure_size))
+    # img = cv2.blur(img,(figure_size, figure_size))
     
     shape = img.shape
     images = np.zeros((1, *shape))
     images[0] = img
-    bz = Binarizer(threshold=20/255)
+    bz = Binarizer(threshold=80/255)
     binned = bz.fit_transform(images)
     p = make_pipeline(HeightFiltration(direction=np.array([1,1])), CubicalPersistence(), BettiCurve())
     return p.fit_transform(binned)
+
+
+def bettiCurve_pipe2(img_file):
+    """
+    Pipeline 2: Cubical Perisitance --> Betti Curve
+    """
+    img = cv2.imread(img_file)  
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    # blur the image to reduce noise
+    figure_size = 9 # the dimension of the x and y axis of the kernal.
+    # img = cv2.blur(img,(figure_size, figure_size))
+    
+    shape = img.shape
+    images = np.zeros((1, *shape))
+    images[0] = img
+    p = make_pipeline(CubicalPersistence(), BettiCurve())
+    return p.fit_transform(images)
