@@ -21,7 +21,7 @@ def bettiCurve_pipe1(img_file):
     images[0] = img
     bz = Binarizer(threshold=80/255)
     binned = bz.fit_transform(images)
-    p = make_pipeline(HeightFiltration(direction=np.array([1,1])), CubicalPersistence(), BettiCurve())
+    p = make_pipeline(HeightFiltration(direction=np.array([1,1])), CubicalPersistence(), BettiCurve(n_bins=50))
     return p.fit_transform(binned)
 
 
@@ -38,5 +38,5 @@ def bettiCurve_pipe2(img_file):
     shape = img.shape
     images = np.zeros((1, *shape))
     images[0] = img
-    p = make_pipeline(CubicalPersistence(), BettiCurve())
+    p = make_pipeline(CubicalPersistence(), BettiCurve(n_bins=50))
     return p.fit_transform(images)
