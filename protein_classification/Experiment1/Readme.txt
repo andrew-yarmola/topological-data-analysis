@@ -1,6 +1,6 @@
 Experiment 1:
 - Look at all images with a single protein present and try to run a few topological invariant calculators on them, try to discern differences:
-    a) Betti Curves
+    a) persistence entropy
     
 Todo:
     - Find 5 files for each protein type, each containing a single type of potein
@@ -43,3 +43,6 @@ However, our training file is missing the following:
 27.  Rods & rings
 Since they don't occur as the sole protein in any 1 file (27 does in a single file)
 
+Current tasks:
++ Dump files with corresponding protein numbers into csv file
++ set up pre-processing (i.e. loading of pictures)
