@@ -1,0 +1,52 @@
+import dionysus
+import numpy as np
+import networkx as nx
+import collections
+
+Arc = collections.namedtuple("Arc", ("length"))
+
+# example edge_to_arc dict
+edge_to_arc = {(0,1): Arc(length=5), (0,2): Arc(length=4),
+               (1,2): Arc(length=1)}
+
+def get_filtration(edge_to_arc):
+  """Build a clique filtration from an undirected graph."""
+  G = nx.Graph()
+  for e, a in edge_to_arc.items():
+    G.add_edge(e[0], e[1], length=a.length)
+
+  nodes = list(G.nodes)
+  node_count = len(nodes)
+
+  assert node_count == max(nodes) + 1 and min(nodes) == 0
+
+  dist_mat = np.zeros((node_count, node_count))
+  for n, dists in nx.all_pairs_dijkstra_path_length(G, weight='length'):
+    for m, d in dists.items():
+      dist_mat[n, m] = d
+
+  simplices = []
+  for i1 in range(node_count):
+    simplices.append(dionysus.Simplex((i1,), 0))
+    for i2 in range(i1+1, node_count):
+      simplices.append(dionysus.Simplex((i1, i2), dist_mat[i1, i2]))
+      for i3 in range(i2+1, node_count):
+        idx = max(dist_mat[i1, i2], dist_mat[i1, i3], dist_mat[i2, i3])
+        simplices.append(dionysus.Simplex((i1, i2, i3), idx))
+  
+  filtration = dionysus.Filtration()  
+  for s in sorted(simplices, key=lambda s: s.data):
+    filtration.add(s)
+
+  return filtration
+                
+def get_persitent_homology(filtration):
+  return dionysus.homology_persistence(filtration, 2, 'clearing', False)
+
+if __name__ == '__main__':
+  filtration = get_filtration(edge_to_arc)
+  for s in filtration:
+    print(s)
+  ph = get_persitent_homology(filtration)
+  for c in ph:
+    print(c) 
