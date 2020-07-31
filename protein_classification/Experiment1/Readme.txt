@@ -46,3 +46,4 @@ Since they don't occur as the sole protein in any 1 file (27 does in a single fi
 Current tasks:
 + Dump files with corresponding protein numbers into csv file
 + set up pre-processing (i.e. loading of pictures)
+- set up an array with the needed values (h0 and h1 PEs for different height and radial filtrations)
