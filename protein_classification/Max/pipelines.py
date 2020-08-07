@@ -6,6 +6,7 @@ from gtda.pipeline import make_pipeline
 from gtda.diagrams import BettiCurve
 from gtda.homology import CubicalPersistence
 from gtda.diagrams import PersistenceEntropy
+from gtda.diagrams import Amplitude
 
 def bettiCurve_pipe1(img_file):
     """
@@ -44,7 +45,7 @@ def bettiCurve_pipe2(img_file):
 
 def persistenceEntropy(img_file):
     """
-    Pipeline 2: Cubical Perisitance --> Persistence Entropy
+    Pipeline: Cubical Perisitance --> Persistence Entropy
     """
     img = cv2.imread(img_file)  
     img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -56,4 +57,20 @@ def persistenceEntropy(img_file):
     images = np.zeros((1, *shape))
     images[0] = img
     p = make_pipeline(CubicalPersistence(), PersistenceEntropy())
+    return p.fit_transform(images)
+
+def bettiAmplitude(img_file):
+    """
+    Pipeline: Cubical Perisitance --> Amplitude of Betti Curve
+    """
+    img = cv2.imread(img_file)  
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    # blur the image to reduce noise
+    figure_size = 9 # the dimension of the x and y axis of the kernal.
+    img = cv2.blur(img,(figure_size, figure_size))
+    
+    shape = img.shape
+    images = np.zeros((1, *shape))
+    images[0] = img
+    p = make_pipeline(CubicalPersistence(), Amplitude(metric='betti'))
     return p.fit_transform(images)
