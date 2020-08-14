@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import plotly.express as px
 import itertools
-from gtda.images import Binarizer, HeightFiltration
+from gtda.images import Binarizer, HeightFiltration, Inverter, DilationFiltration, ErosionFiltration
 from gtda.pipeline import Pipeline
 from gtda.pipeline import make_pipeline
 from gtda.diagrams import BettiCurve
@@ -39,6 +39,7 @@ def pipeline1(images):
     # Pipeline parameters
     bin_thresholds = [np.percentile(images[0], 93)/np.max(images[0])]
     directions = [np.array([np.cos(t), np.sin(t)]) for t in np.linspace(0, 2 * np.pi, 8)[:-1]]
+    n_iterations = np.linspace(1,21, 5).astype(int).tolist()
     
     features = [('bottleneck', Amplitude(metric='bottleneck', n_jobs=-1)), 
             ('PE', PersistenceEntropy(n_jobs=-1))]
@@ -46,19 +47,24 @@ def pipeline1(images):
     # Make filtrations
     binned_steps = [('binarizer_{}'.format(t), Binarizer(threshold=t, n_jobs=-1)) for t in bin_thresholds]
     filtrations = [('height_{}'.format(d), HeightFiltration(direction=d, n_jobs=-1)) for d in directions]
+    filtrations +=  [('erosion_{}'.format(i), ErosionFiltration(n_iterations= i, n_jobs=-1)) for i in n_iterations]
+    filtrations +=  [('erosion_{}'.format(i), DilationFiltration(n_iterations= i, n_jobs=-1)) for i in n_iterations]
 
     # Make pipelines
-    cubical_lower = [('cubical', CubicalPersistence(n_jobs=-1))]
-    # cubical_upper = [('inverter', Inverter()), ('cubical', CubicalPersistence())]
+    cubical_lower = ('cubical', CubicalPersistence(n_jobs=-1))
 
-    partial_pipeline_steps = [cubical_lower]
+    partial_pipeline_steps = []
+    partial_pipeline_steps.append([cubical_lower])
+    partial_pipeline_steps.append([('inverter', Inverter(n_jobs=-1)), cubical_lower])
 
     for b, f in itertools.product(binned_steps, filtrations):
         partial_pipeline_steps.append([b,f, ('cubical', CubicalPersistence(n_jobs=-1))])
 
+
     feature_pipelines = []
     for s, f in itertools.product(partial_pipeline_steps, features):
         feature_pipelines.append(Pipeline(s + [f]))
+        
     return feature_pipelines
 
 def bettiCurve_pipe1(img_file):
