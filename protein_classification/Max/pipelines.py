@@ -10,7 +10,7 @@ from gtda.homology import CubicalPersistence
 from gtda.diagrams import PersistenceEntropy
 from gtda.diagrams import Amplitude
 
-def generate_features(img_file, feature_pipelines):
+def generate_features(img_file):
     """
     Applies image to a custom feature_pipline
     """
@@ -25,19 +25,19 @@ def generate_features(img_file, feature_pipelines):
     images[0] = img
     
     features = []
-    for p in feature_pipelines:
+    for p in pipeline1(images):
         for f in p.fit_transform(images)[0]:
             features.append(f)
     return features
 
 
-def pipeline1():
+def pipeline1(images):
     """
     Binarizer --> Height Filtration (from 8 directions) --> Cubical Persistance --> Amp, PE
     return: Array of pipelines
     """
     # Pipeline parameters
-    bin_thresholds = [40/255]
+    bin_thresholds = [np.percentile(images[0], 93)/np.max(images[0])]
     directions = [np.array([np.cos(t), np.sin(t)]) for t in np.linspace(0, 2 * np.pi, 8)[:-1]]
     
     features = [('bottleneck', Amplitude(metric='bottleneck', n_jobs=-1)), 
