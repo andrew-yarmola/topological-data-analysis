@@ -48,7 +48,7 @@ def pipeline1(images):
     binned_steps = [('binarizer_{}'.format(t), Binarizer(threshold=t, n_jobs=-1)) for t in bin_thresholds]
     filtrations = [('height_{}'.format(d), HeightFiltration(direction=d, n_jobs=-1)) for d in directions]
     filtrations +=  [('erosion_{}'.format(i), ErosionFiltration(n_iterations= i, n_jobs=-1)) for i in n_iterations]
-    filtrations +=  [('erosion_{}'.format(i), DilationFiltration(n_iterations= i, n_jobs=-1)) for i in n_iterations]
+    filtrations +=  [('dilation_{}'.format(i), DilationFiltration(n_iterations= i, n_jobs=-1)) for i in n_iterations]
 
     # Make pipelines
     cubical_lower = ('cubical', CubicalPersistence(n_jobs=-1))
