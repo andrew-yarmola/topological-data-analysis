@@ -33,7 +33,7 @@ def generate_features(img_file):
 
 def pipeline1(images):
     """
-    Binarizer --> Height Filtration (from 8 directions) --> Cubical Persistance --> Amp, PE
+    Binarizer --> Height Filtration, Erosion Filtration, Dilation Filtration --> Cubical Persistance --> Amp, PE
     return: Array of pipelines
     """
     # Pipeline parameters
